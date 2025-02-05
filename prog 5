@@ -1,0 +1,60 @@
+#include <stdio.h>
+
+struct Process {
+    int id;            
+    int burstTime;      
+    int priority;       
+    int waitingTime;    
+    int turnAroundTime; 
+};
+
+void sortByPriority(struct Process processes[], int n) {
+    struct Process temp;
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (processes[i].priority < processes[j].priority) { 
+                temp = processes[i];
+                processes[i] = processes[j];
+                processes[j] = temp;
+            }
+        }
+    }
+}
+
+int main() {
+    int n;
+    float avgWaitingTime = 0, avgTurnAroundTime = 0;
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    struct Process processes[n];
+
+    for (int i = 0; i < n; i++) {
+        processes[i].id = i + 1;
+        printf("Enter burst time for process %d: ", processes[i].id);
+        scanf("%d", &processes[i].burstTime);
+        printf("Enter priority for process %d (higher value = higher priority): ", processes[i].id);
+        scanf("%d", &processes[i].priority);
+    }
+
+    sortByPriority(processes, n);
+
+    processes[0].waitingTime = 0; 
+
+    for (int i = 1; i < n; i++) {
+        processes[i].waitingTime = processes[i - 1].waitingTime + processes[i - 1].burstTime;
+    }
+
+    for (int i = 0; i < n; i++) {
+        processes[i].turnAroundTime = processes[i].waitingTime + processes[i].burstTime;
+        avgWaitingTime += processes[i].waitingTime;
+        avgTurnAroundTime += processes[i].turnAroundTime;
+    }
+
+    avgWaitingTime /= n;
+    avgTurnAroundTime /= n;
+
+    printf("\nProcess\tBurst Time\tPriority\tWaiting Time\tTurnaround Time\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t\t%d\t\t%d\t\t%d\n"
